@@ -18,13 +18,15 @@ public class spin extends ApplicationAdapter {
     private SpriteBatch spriteBatch;
     private Viewport viewport;
     private Sprite sprite;
-    private Sprite centerSprite;
     private float originalY;
     private float velocityY = 0;
     private boolean jumping = false;
     private boolean facingRight = true;
+    private boolean isMoving = false;
 
     private Music backgroundMusic;
+
+    private Texture groundTexture;
 
     @Override
     public void create() {
@@ -33,26 +35,22 @@ public class spin extends ApplicationAdapter {
         shapeRenderer = new ShapeRenderer();
         spriteBatch = new SpriteBatch();
 
-        backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("assets/sansd.mp3"));
+        backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("assets/daylight.mp3"));
         backgroundMusic.setLooping(true);
         backgroundMusic.play();
 
         Texture texture = new Texture("assets/mario.png");
         sprite = new Sprite(texture);
         sprite.setPosition(100, 100);
-        sprite.setSize(100,100);
-
-        Texture centerTexture = new Texture("assets/title.png");
-        centerSprite = new Sprite(centerTexture);
-        centerSprite.setScale(0.5F,0.5F);
-        centerSprite.setPosition((Gdx.graphics.getWidth() - centerSprite.getWidth()) / 2, (Gdx.graphics.getHeight() - centerSprite.getHeight()) / 2);
+        sprite.setSize(100, 100);
 
         originalY = sprite.getY();
+        groundTexture = new Texture("assets/ground.png");
     }
 
     @Override
     public void render() {
-        Gdx.gl.glClearColor(0.0f,0.0f,1.0f,0.0f);
+        Gdx.gl.glClearColor(0.560784F, 0.560784F, 0.737255F, 1.0f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         viewport.apply();
@@ -82,13 +80,21 @@ public class spin extends ApplicationAdapter {
         } else {
             sprite.setFlip(false, false);
         }
+
         sprite.draw(spriteBatch);
-        centerSprite.draw(spriteBatch);
+        spriteBatch.draw(groundTexture, 0, 0, viewport.getWorldWidth(), 100);
         spriteBatch.end();
     }
 
     private void handleInput() {
         float movementSpeed = 600;
+        if (Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.RIGHT) ||
+                Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.D)) {
+            isMoving = true;
+        } else {
+            isMoving = false;
+        }
+
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
             sprite.setX(sprite.getX() - movementSpeed * Gdx.graphics.getDeltaTime());
             facingRight = false;
@@ -123,5 +129,6 @@ public class spin extends ApplicationAdapter {
         shapeRenderer.dispose();
         spriteBatch.dispose();
         backgroundMusic.dispose();
+        groundTexture.dispose();
     }
 }
